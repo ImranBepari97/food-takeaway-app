@@ -3,7 +3,9 @@ package imranatsotonhack.takeawayapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -46,15 +48,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
+    private FirebaseUser user;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private SharedPreferences mPref;
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -138,6 +141,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+
+        mPref = getSharedPreferences("userID", Context.MODE_PRIVATE);
     }
 
 
@@ -233,6 +239,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             showProgress(true);
             //attempt login
+            Log.d("LoginMessage", "We logging in");
             signIn(email, password);
         }
     }
@@ -471,10 +478,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                     Toast.LENGTH_SHORT).show();
                             showProgress(false);
                         } else {
+                            user = getCurrentUser();
+                            SharedPreferences.Editor editor = mPref.edit();
+                            editor.putString("userID", user.getUid());
+                            editor.commit();
+
                             Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
-                            EditText editText = (EditText) findViewById(R.id.email);
-                            String message = editText.getText().toString();
-                            intent.putExtra("stuff", message);
+//                            intent.putExtra("user", mAuth.getCurrentUser());
                             startActivity(intent);
                         }
 
@@ -483,7 +493,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 });
     }
 
-    public void getCurrentUser() {
+    public FirebaseUser getCurrentUser() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // Name, email address, and profile photo Url
@@ -495,7 +505,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // authenticate with your backend server, if you have one. Use
             // FirebaseUser.getToken() instead.
             String uid = user.getUid();
+
+
         }
+
+        return user;
     }
 }
 
