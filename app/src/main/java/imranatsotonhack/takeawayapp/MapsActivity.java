@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.appindexing.Action;
@@ -16,11 +17,14 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -28,6 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private LocationManager locationManager;
     private Location currentLocation;
+    private Marker mCurrLocationMarker;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -70,12 +75,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+        Log.d("gps", "gps passed permissions test");
+
+        mMap.setMyLocationEnabled(true);
 
         locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER, 5000, 10, new android.location.LocationListener() {
                     @Override
                     public void onLocationChanged(Location location) {
                         currentLocation = location;
+
+                        currentLocation = location;
+                        if (mCurrLocationMarker != null) {
+                            mCurrLocationMarker.remove();
+                        }
+
+                        //Place current location marker
+                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.position(latLng);
+                        markerOptions.title("Current Position");
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                        mCurrLocationMarker = mMap.addMarker(markerOptions);
+
+                        //move map camera
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+
+//                        if (mGoogleApiClient != null) {
+//                            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+//                        }
                     }
 
                     @Override
@@ -93,6 +122,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
                 });
+
     }
     /**
      * Manipulates the map once available.
