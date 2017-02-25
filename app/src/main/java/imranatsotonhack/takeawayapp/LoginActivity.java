@@ -47,6 +47,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.Manifest.permission.MASTER_CLEAR;
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -481,6 +482,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             user = getCurrentUser();
                             SharedPreferences.Editor editor = mPref.edit();
                             editor.putString("userID", user.getUid());
+                            editor.putString("name", user.getDisplayName());
+                            editor.putString("email", user.getEmail());
+                            editor.putString("photoURL", user.getPhotoUrl().toString());
                             editor.commit();
 
                             Intent intent = new Intent(LoginActivity.this, MapsActivity.class);

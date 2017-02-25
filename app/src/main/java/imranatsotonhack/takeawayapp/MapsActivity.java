@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,8 +43,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locationManager;
     private Location currentLocation;
     private Marker mCurrLocationMarker;
+
+    //user
     private FirebaseUser user;
+
+    //shared data?
     SharedPreferences  mPrefs;
+
+    //database stuff
     private FirebaseDatabase database;
     private DatabaseReference myRef;
 
@@ -72,6 +80,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         initDatabase();
         mPrefs = getPreferences(MODE_PRIVATE);
+
+
+        Button profileButton = (Button) findViewById(R.id.profileButton);
+        profileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     public void initDatabase() {
@@ -90,8 +109,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.w("readError", "Failed to read value.", error.toException());
             }
         });
-        myRef.setValue("Hello, World!");
 
+        myRef.setValue("yes hello");
+//new Post("food", 0.01f, 0.01f, mPrefs.getString("userID", "userID")).toString()
     }
     public void initializeGPS() {
         //checks if permission for GPS is there

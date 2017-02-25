@@ -17,6 +17,16 @@ public class Post {
         this.uid = uid;
     }
 
+    @Override
+    public String toString() {
+        return "Post{" +
+                "food='" + food + '\'' +
+                ", friends=" + lng +
+                ", lng=" + lng +
+                ", lat=" + lat +
+                '}';
+    }
+
     public String getFood() {
         return food;
     }
