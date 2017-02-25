@@ -144,7 +144,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 
 
-        mPref = getSharedPreferences("userID", Context.MODE_PRIVATE);
+        mPref = getSharedPreferences("mPref", Context.MODE_PRIVATE);
     }
 
 
@@ -482,11 +482,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             user = getCurrentUser();
                             SharedPreferences.Editor editor = mPref.edit();
                             editor.putString("userID", user.getUid());
-                            editor.putString("name", user.getDisplayName());
+                            Log.d("EMAIL", user.getEmail());
                             editor.putString("email", user.getEmail());
-                            editor.putString("photoURL", user.getPhotoUrl().toString());
                             editor.commit();
 
+                            Log.d("EMAIL", mPref.getString("email","no email?"));
                             Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
 //                            intent.putExtra("user", mAuth.getCurrentUser());
                             startActivity(intent);

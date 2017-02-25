@@ -30,6 +30,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,17 +42,22 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 public class AddPostActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
 
+    private FirebaseDatabase database;
+    private DatabaseReference myRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("users");
+
         setContentView(R.layout.activity_add_post);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -77,8 +85,6 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
-
-
 
 
     /**
@@ -147,5 +153,7 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
 
         mEmailView.setAdapter(adapter);
     }
+
+
 }
 
