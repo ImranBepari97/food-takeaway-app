@@ -178,9 +178,9 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
         myRef = database.getReference().child("posts").child(postID).child("foodPrice");
         myRef.setValue(mFoodPrice.getText().toString());
         myRef = database.getReference().child("posts").child(postID).child("lat");
-        myRef.setValue(lat);
-        myRef = database.getReference().child("posts").child(postID).child("lng");
-        myRef.setValue(lng);
+        myRef.setValue(mPref.getLong("lat", 0));
+        myRef = database.getReference().child("posts").child(postID).child("long");
+        myRef.setValue(mPref.getLong("lng", 0));
         myRef = database.getReference().child("posts").child(postID).child("uid");
         myRef.setValue(mPref.getString("userID", "null"));
     }

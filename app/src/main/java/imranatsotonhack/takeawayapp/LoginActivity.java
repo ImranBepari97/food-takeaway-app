@@ -482,11 +482,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             user = getCurrentUser();
                             SharedPreferences.Editor editor = mPref.edit();
                             editor.putString("userID", user.getUid());
-                            Log.d("EMAIL", user.getEmail());
                             editor.putString("email", user.getEmail());
                             editor.commit();
 
-                            Log.d("EMAIL", mPref.getString("email","no email?"));
                             Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
 //                            intent.putExtra("user", mAuth.getCurrentUser());
                             startActivity(intent);

@@ -86,6 +86,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Location loc = mMap.getMyLocation();
+
+                SharedPreferences.Editor editor = mPrefs.edit();
+                editor.putLong("lng", (long) (loc.getLongitude()));
+                editor.putLong("lat", (long) loc.getLatitude());
+
                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                 startActivity(intent);
             }
@@ -101,11 +107,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for(DataSnapshot eachChild : dataSnapshot.getChildren()) {
-//                    double lat = Double.parseDouble((String) eachChild.child("lat").getValue());
-//                    double lng = Double.parseDouble((String) eachChild.child("lng").getValue());
-//                    mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))
-//                            .title((String) eachChild.child("foodName").getValue()));
-                    Log.d("childrenPosts", eachChild.getKey());
+                    double lat = 0;
+                    if (eachChild.child("lat").getValue() != null) {
+                        lat = Double.parseDouble(eachChild.child("lat").getValue().toString());
+                    }
+
+                    double lng = 0;
+                    if(eachChild.child("long").getValue() != null) {
+                        lng = Double.parseDouble(eachChild.child("long").getValue().toString());
+                    }
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))
+                            .title((String) eachChild.child("foodName").getValue()));
                 }
             }
 
