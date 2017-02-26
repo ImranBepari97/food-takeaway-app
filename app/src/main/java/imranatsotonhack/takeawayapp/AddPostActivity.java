@@ -3,6 +3,13 @@ package imranatsotonhack.takeawayapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.SharedPreferencesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -28,6 +35,10 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -44,6 +55,13 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
 
     private FirebaseDatabase database;
     private DatabaseReference myRef;
+
+    private LocationManager locationManager;
+
+    private double lat;
+    private double lng;
+
+    private SharedPreferences mPref;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -71,7 +89,7 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
         });
 
         database = FirebaseDatabase.getInstance();
-
+        mPref = getSharedPreferences("mPref", MODE_PRIVATE);
 
 //        myRef.addValueEventListener(new ValueEventListener() {
 //            @Override
@@ -93,6 +111,8 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
                 attemptLogin();
             }
         });
+
+        initGPS();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -144,12 +164,24 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
     }
 
     public void uploadPost() {
+
+
+
+        //Post stuff
         myRef = database.getReference().child("posts");
-        generatePostID();
-        myRef = database.getReference().child("posts").child(generatePostID()).child("foodName");
+        String postID = generatePostID();
+        myRef = database.getReference().child("posts").child(postID).child("foodName");
         myRef.setValue(mFoodName.getText().toString());
-        myRef = database.getReference().child("posts").child(generatePostID()).child("foodDesc");
+        myRef = database.getReference().child("posts").child(postID).child("foodDesc");
         myRef.setValue(mFoodDesc.getText().toString());
+        myRef = database.getReference().child("posts").child(postID).child("foodPrice");
+        myRef.setValue(mFoodPrice.getText().toString());
+        myRef = database.getReference().child("posts").child(postID).child("lat");
+        myRef.setValue(lat);
+        myRef = database.getReference().child("posts").child(postID).child("lng");
+        myRef.setValue(lng);
+        myRef = database.getReference().child("posts").child(postID).child("uid");
+        myRef.setValue(mPref.getString("userID", "null"));
     }
 
     public String generatePostID() {
@@ -211,7 +243,6 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
     }
 
 
@@ -250,5 +281,44 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }
+
+    public void initGPS() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("LOCATION", "Location check failed.");
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
+
+
+        locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER, 0, 0, new android.location.LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        lat = location.getLatitude();
+                        lng = location.getLongitude();
+                        Log.d("LOCATION", "pls");
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+                    @Override
+                    public void onProviderEnabled(String provider) {}
+
+                    @Override
+                    public void onProviderDisabled(String provider) {}
+                });
+
+
+    }
+
 }
 

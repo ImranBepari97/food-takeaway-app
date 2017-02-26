@@ -131,47 +131,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.setMyLocationEnabled(true);
 
-        locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, 5000, 10, new android.location.LocationListener() {
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        currentLocation = location;
-
-                        currentLocation = location;
-                        if (mCurrLocationMarker != null) {
-                            mCurrLocationMarker.remove();
-                        }
-
-                        //Place current location marker
-                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.position(latLng);
-                        markerOptions.title("Current Position");
-                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-                        mCurrLocationMarker = mMap.addMarker(markerOptions);
-
-                        //move map camera
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
-
-                    }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String provider) {
-
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String provider) {
-
-                    }
-                });
-
     }
     /**
      * Manipulates the map once available.
