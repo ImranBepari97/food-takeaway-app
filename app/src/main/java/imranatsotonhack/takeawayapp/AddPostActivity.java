@@ -3,21 +3,15 @@ package imranatsotonhack.takeawayapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
-import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,33 +23,24 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
-import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
  */
 public class AddPostActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
     // UI references.
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
+    private EditText mFoodDesc;
+    private EditText mFoodName;
+    private EditText mFoodPrice;
 
     private FirebaseDatabase database;
     private DatabaseReference myRef;
@@ -71,10 +56,11 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
 
         setContentView(R.layout.activity_add_post);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mFoodPrice = (EditText) findViewById(R.id.foodPrice);
+        mFoodName = (EditText) findViewById(R.id.foodName);
+        mFoodDesc = (EditText) findViewById(R.id.foodDesc);
 
-        mPasswordView = (EditText) findViewById(R.id.foodDesc);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mFoodDesc.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
@@ -84,32 +70,27 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
             }
         });
 
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
-
         database = FirebaseDatabase.getInstance();
-        myRef = database.getReference().child("posts").child(generatePostID());
 
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-//                displayName = (String) dataSnapshot.child("displayName").getValue();
-//                Log.d("dbRead", "Value is: " + displayName);
-            }
 
-            @Override
-            public void onCancelled(DatabaseError error) {
-                Log.w("readError", "Failed to read value.", error.toException());
-            }
-        });
-
+//        myRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+////                displayName = (String) dataSnapshot.child("displayName").getValue();
+////                Log.d("dbRead", "Value is: " + displayName);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError error) {
+//                Log.w("readError", "Failed to read value.", error.toException());
+//            }
+//        });
+//
         Button mEmailSignInButton = (Button) findViewById(R.id.submit);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
+                attemptLogin();
             }
         });
 
@@ -120,29 +101,32 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
 
     private void attemptLogin() {
         // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
+        mFoodName.setError(null);
+        mFoodDesc.setError(null);
+        mFoodPrice.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        String foodName = mFoodName.getText().toString();
+        String foodDesc = mFoodDesc.getText().toString();
+        float foodPrice = Float.parseFloat(mFoodPrice.getText().toString());
 
         boolean cancel = false;
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
+        if (TextUtils.isEmpty(foodDesc)) {
+            mFoodDesc.setError("Field required.");
+            focusView = mFoodDesc;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
+        if (TextUtils.isEmpty(foodName)) {
+            mFoodName.setError(getString(R.string.error_field_required));
+            focusView = mFoodName;
             cancel = true;
         }
+
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
@@ -160,7 +144,12 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
     }
 
     public void uploadPost() {
-
+        myRef = database.getReference().child("posts");
+        generatePostID();
+        myRef = database.getReference().child("posts").child(generatePostID()).child("foodName");
+        myRef.setValue(mFoodName.getText().toString());
+        myRef = database.getReference().child("posts").child(generatePostID()).child("foodDesc");
+        myRef.setValue(mFoodDesc.getText().toString());
     }
 
     public String generatePostID() {
@@ -184,28 +173,28 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+            mFoodPrice.setVisibility(show ? View.GONE : View.VISIBLE);
+            mFoodPrice.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    mFoodPrice.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
+            mFoodName.setVisibility(show ? View.VISIBLE : View.GONE);
+            mFoodName.animate().setDuration(shortAnimTime).alpha(
                     show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                    mFoodName.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
             });
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mFoodName.setVisibility(show ? View.VISIBLE : View.GONE);
+            mFoodPrice.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -223,15 +212,6 @@ public class AddPostActivity extends AppCompatActivity implements LoaderCallback
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(AddPostActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
     }
 
 
