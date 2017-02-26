@@ -95,13 +95,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void initDatabase() {
         database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("message");
+        myRef = database.getReference("posts");
 
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String value = dataSnapshot.getValue(String.class);
-                Log.d("dbRead", "Value is: " + value);
+                for(DataSnapshot eachChild : dataSnapshot.getChildren()) {
+//                    double lat = Double.parseDouble((String) eachChild.child("lat").getValue());
+//                    double lng = Double.parseDouble((String) eachChild.child("lng").getValue());
+//                    mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng))
+//                            .title((String) eachChild.child("foodName").getValue()));
+                    Log.d("childrenPosts", eachChild.getKey());
+                }
             }
 
             @Override
@@ -110,7 +115,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        myRef.setValue("yes hello");
 //new Post("food", 0.01f, 0.01f, mPrefs.getString("userID", "userID")).toString()
     }
     public void initializeGPS() {
