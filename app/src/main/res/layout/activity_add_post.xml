@@ -56,6 +56,19 @@
                     android:hint="Enter Food Description" />
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="81dp"
+                    android:inputType="numberDecimal"
+                    android:ems="10"
+                    android:id="@+id/foodPrice"
+                    android:hint="Enter Food Price" />
+            </android.support.design.widget.TextInputLayout>
+
             <Button
                 android:id="@+id/submit"
                 style="?android:textAppearanceSmall"

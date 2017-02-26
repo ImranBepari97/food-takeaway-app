@@ -45,14 +45,15 @@
         android:layout_alignParentEnd="true" />
 
     <TextView
+        android:text="@string/cast_intro_overlay_button_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/displayName"
+        android:id="@+id/displayNameField"
         android:layout_marginTop="19dp"
         android:layout_below="@+id/displayNameTag"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:text="@string/cast_intro_overlay_button_text" />
+         />
 
     <TextView
         android:text="Email"
@@ -60,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:id="@+id/textView2"
-        android:layout_below="@+id/displayName"
+        android:layout_below="@+id/displayNameField"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
